@@ -167,17 +167,17 @@ def main(n):
         y0=[pr0,0.0]
         sol1=odeint(integrale,y0,t,args=(rho,Umax,H,r,mu,Uf,rc2))
         sol2=odeint(integrale,y0,t,args=(rho,Umax,H,r2,mu,Uf,rc2))
-        #x1=(sol1[:,0]+rc2)*np.cos(t)
-        #y1=(sol1[:,0]+rc2)*np.sin(t)
+        x1=(sol1[:,0]+rc2)*np.cos(t)
+        y1=(sol1[:,0]+rc2)*np.sin(t)
         print("sol1=",sol1)
         print("sol2=",sol2)
-        x=t
-        y=sol1[:,0]
-        y2=sol2[:,0]
-        #x2=(sol2[:,0]+rc2)*np.cos(t)
-        #y2=(sol2[:,0]+rc2)*np.sin(t)
-        plt.plot(x,y,"r")
-        plt.plot(x,y2,"b")
+        #x=t
+        #y=sol1[:,0]
+        #y2=sol2[:,0]
+        x2=(sol2[:,0]+rc2)*np.cos(t)
+        y2=(sol2[:,0]+rc2)*np.sin(t)
+        plt.plot(x1,y1,"r")
+        plt.plot(x2,y2,"b")
 
 
 main(2)
