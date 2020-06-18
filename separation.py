@@ -7,25 +7,27 @@ from scipy.integrate import odeint
 
 
 
-H=50e-6                                          #Hauteur du tube
+H=100e-6                                          #Hauteur du tube
 mu = 0.001 #
 r=15e-6                                           #Taille particule 1
 r2=10e-6                                          #Taille particule 2
-a=250e-6/2/np.pi                                  #Espace entre chaque tour de la spirale
+a=350e-6                                 #Espace entre chaque tour de la spirale
 m=1050*4/3*np.pi*(r/2)**3                         #Masse particule
 rho=1000
 Uf=130e-3
 Umax=2*Uf
 m2=1050*4/3*np.pi*(r2/2)**3
 
-pphi=10*np.pi                                     #Position initale de la particule selon phi
-rc=(a)*((pphi*pphi+1)**(3/2))/(pphi*pphi+2)       #Rayon de courbure inital de la spirale
+pphi=np.linspace(10*np.pi,0,100)                                   #Position initale de la particule selon phi
+#rc=(a)*((pphi*pphi+1)**(3/2))/(pphi*pphi+2)   
+    #Rayon de courbure inital de la spirale
+rc=np.linspace(0.003,0.00125,100)
 vphi=0.27                                         #Vitesse constante longitudinale
 dt=0.00001                                        #Pas de temps
 vr=0                                              #Vitesse latérale initiale de la particule 1
 vr2=0                                             #Vitesse latérale initiale de la particule 2
-pr0=H/3+0.000001                                  #Position initale de la particule 1 au sein du tube
-pr02=H/3                                          #Position initale de la particule 2 au sein du tube
+pr0=H/2                                           #Position initale de la particule 1 au sein du tube
+pr02=H/2                                          #Position initale de la particule 2 au sein du tube
 pr=rc+pr0                                         #Position initale de la particule 1 
 pr2=rc+pr02                                       #Position initale de la particule 2
 
@@ -92,25 +94,27 @@ def methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc):
     tab_Fl=np.array([0])
     tab_Fd=np.array([0])
     tabr0=np.array([pr0])
-    while pphi>0.001 : 
-        vr= vr-Fl(rho,Umax,H,r,pr0)/m*dt+Fd(mu,r,rc,rho,Uf,H)/m*dt              #Utilisation du PFD sur la particule 1
-        vr2=vr2-Fl(rho,Umax,H,r2,pr02)/m2*dt+Fd(mu,r2,rc,rho,Uf,H)/m2*dt        #Utilisation du PFD sur la particule 2
+    for i in range(99): 
+        rcb=rc[i]
+        pphib=pphi[i]
+        vr= vr-Fl(rho,Umax,H,r,pr0)/m*dt+Fd(mu,r,rcb,rho,Uf,H)/m*dt              #Utilisation du PFD sur la particule 1
+        vr2=vr2-Fl(rho,Umax,H,r2,pr02)/m2*dt+Fd(mu,r2,rcb,rho,Uf,H)/m2*dt        #Utilisation du PFD sur la particule 2
         pr0=pr0+vr*dt
         pr02=pr02+vr2*dt
-        rc= (a)*((pphi*pphi+1)**(3/2))/(pphi*pphi+2)
-        pr=pr0+rc
-        pr2=pr02+rc
-        pphi=pphi-0.27/rc*dt
-        
+        #rc= (a/(2*np.pi))*((pphi*pphi+1)**(3/2))/(pphi*pphi+2)
+        pr=pr0+rcb
+        pr2=pr02+rcb
+        pphib=pphib-0.27/rcb*dt
         #Mise à jour des tableaux à chaque passage
-        tabrc=np.append(tabrc,rc)
-        tabphi=np.append(tabphi,pphi)
+        tabrc=np.append(tabrc,rcb)
         tabr=np.append(tabr,pr)
-        tabr2=np.append(tabr2,pr2)
+        tabphi=np.append(tabphi,pphib)
+        #tabr2=np.append(tabr2,pr2)
         tab_vr=np.append(tab_vr,vr)
         tab_vr2=np.append(tab_vr2,vr2)
         tab_Fl=np.append(tab_Fl,Fl(rho,Umax,H,r,pr0))
         tab_Fd=np.append(tab_Fd,Fd(mu,r,rc,rho,Uf,H))
+        print(pr)
     return(tabr,tabr2,tabphi)
 
 
@@ -118,20 +122,18 @@ def methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc):
 #Tracé la spirale d'archimède de 5 tours à bonne échelle
 
 def spirale():
-    tabt=np.linspace(0,10*np.pi,10001)
+    tabt=np.linspace(10*np.pi,0,10001)
     tabrint=(a*tabt)
-    tabrext=tabrint+50e-6
-    tabmil=tabrint+25e-6
+    tabrint=np.linspace(0.003,0.00125,10001)
+    tabrext=tabrint+100e-6
     tabxI=tabrint*np.cos(tabt)
     tabyI=tabrint*np.sin(tabt)
     tabxE=tabrext*np.cos(tabt)
     tabyE=tabrext*np.sin(tabt)
-    tabxM=tabmil*np.cos(tabt)
-    tabyM=tabmil*np.sin(tabt)
-
     plt.plot(tabxI,tabyI,'k')
     plt.plot(tabxE,tabyE,'k')
-    plt.plot(tabxM,tabyM,'k')
+   
+    #plt.plot(tabxM,tabyM,'k')
 
 
 
@@ -140,9 +142,10 @@ def spirale():
 pr'(t)=p(t)
 p'(t)=Fd-Fl'''
 def integrale(y,t,rho,Umax,H,r,mu,Uf,rc):
-    i=int(10*np.pi/t)                                               #indice indiquant l'avancement de la spirale
-    pr,p=y
-    dydt=[p,Fd(mu,r,rc[i],rho,Uf,H)-Fl(rho,Umax,H,r,pr0)]
+    for i in range(100):
+        rcb=rc[i]                                             #indice indiquant l'avancement de la spirale
+        pr,p=y
+        dydt=[p,Fd(mu,r,rc[i],rho,Uf,H)-Fl(rho,Umax,H,r,pr0)]
     return dydt
    
 
@@ -151,33 +154,29 @@ def integrale(y,t,rho,Umax,H,r,mu,Uf,rc):
 
 #Fonction principale permettant d'appeler les fonctions annexes - execution du programme
 def main(n):
-    #spirale()
+    spirale()
     if n==1 :                                                       #Utilisation de la méthode pas
         tab1,tab2,tab3=methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc)
         axes=plt.gca()
-        axes.set_xlim(-0.0013,0.0013)
-        axes.set_ylim(-0.0013,0.0013)
+        axes.set_xlim(-0.004,0.004)
+        axes.set_ylim(-0.004,0.004)
         x=tab1*np.cos(tab3)
         y=tab1*np.sin(tab3)
-        x2=tab2*np.cos(tab3)
+        #x2=tab2*np.cos(tab3)
         plt.plot(x,y,"g")
     if n==2 :                                                       #Utilisation de la méthode intégrale
-        t=np.linspace(10*np.pi,0,num=10001)
-        rc2=(a)*((t*t+1)**(3/2))/(t*t+2)
         y0=[pr0,0.0]
-        sol1=odeint(integrale,y0,t,args=(rho,Umax,H,r,mu,Uf,rc2))
-        sol2=odeint(integrale,y0,t,args=(rho,Umax,H,r2,mu,Uf,rc2))
-        x1=(sol1[:,0]+rc2)*np.cos(t)
-        y1=(sol1[:,0]+rc2)*np.sin(t)
-        print("sol1=",sol1)
-        print("sol2=",sol2)
-        #x=t
+        sol1=odeint(integrale,y0,pphi,args=(rho,Umax,H,r,mu,Uf,rc))
+        sol2=odeint(integrale,y0,pphi,args=(rho,Umax,H,r2,mu,Uf,rc))
+        x1=(sol1[:,0]+rc)*np.cos(pphi)
+        y1=(sol1[:,0]+rc)*np.sin(pphi)
+        #x=phi
         #y=sol1[:,0]
         #y2=sol2[:,0]
-        x2=(sol2[:,0]+rc2)*np.cos(t)
-        y2=(sol2[:,0]+rc2)*np.sin(t)
+        #x2=(sol2[:,0]+rc2)*np.cos(t)
+        #y2=(sol2[:,0]+rc2)*np.sin(t)
         plt.plot(x1,y1,"r")
-        plt.plot(x2,y2,"b")
+        #plt.plot(x,y2,"b")
 
 
 main(2)
