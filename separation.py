@@ -6,10 +6,10 @@ from scipy.integrate import odeint
 
 
 
-
-H=100e-6                                          #Hauteur du tube
+H=20e-6
+W=100e-6                                          #Hauteur du tube
 mu = 0.001 #
-r=15e-6                                           #Taille particule 1
+r=5e-6                                           #Taille particule 1
 r2=10e-6                                          #Taille particule 2
 a=350e-6                                 #Espace entre chaque tour de la spirale
 m=1050*4/3*np.pi*(r/2)**3                         #Masse particule
@@ -26,9 +26,9 @@ vphi=0.27                                         #Vitesse constante longitudina
 dt=0.00001                                        #Pas de temps
 vr=0                                              #Vitesse latérale initiale de la particule 1
 vr2=0                                             #Vitesse latérale initiale de la particule 2
-pr0=H/2                                           #Position initale de la particule 1 au sein du tube
-pr02=H/2                                          #Position initale de la particule 2 au sein du tube
-pr=rc+pr0                                         #Position initale de la particule 1 
+pr0=W/2                                         #Position initale de la particule 1 au sein du tube
+pr02=W/2                                          #Position initale de la particule 2 au sein du tube
+pr=0.00305                                       #Position initale de la particule 1 
 pr2=rc+pr02                                       #Position initale de la particule 2
 
 
@@ -85,8 +85,8 @@ print(len(tab_r))'''
 #Méthode en prenant un pas de temps arbitraire et en passant de l'accélération à la vitesse en utilisant ce pas
 
 def methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc):
-    tabr=np.array([pr])
-    tabphi=np.array([pphi])
+    tabr=np.array([])
+    tabphi=np.array([])
     tabrc=np.array([rc])
     tabr2=np.array([pr2])
     tab_vr=np.array([0])
@@ -114,7 +114,7 @@ def methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc):
         tab_vr2=np.append(tab_vr2,vr2)
         tab_Fl=np.append(tab_Fl,Fl(rho,Umax,H,r,pr0))
         tab_Fd=np.append(tab_Fd,Fd(mu,r,rc,rho,Uf,H))
-        print(pr)
+
     return(tabr,tabr2,tabphi)
 
 
@@ -179,5 +179,5 @@ def main(n):
         #plt.plot(x,y2,"b")
 
 
-main(2)
+main(1)
 plt.show()
