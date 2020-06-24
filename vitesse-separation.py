@@ -12,23 +12,22 @@ from scipy import *
 from scipy . integrate import odeint 
 
 a=2e-6
-a2=8e-6
+a2=7e-6
 rho=1000
 H=30e-6
 U=260e-3
 Q=260e-3/H
 W=100e-6
 pr0=[H/3,W/3]
-pphi=np.linspace(0,10*np.pi,1000) 
+pphi=np.linspace(0,0.5,1000) 
 rc=np.linspace(0.003,0.00125,100)
 vphi=0.27                                         #Vitesse constante longitudinale
 dt=0.0005
 m=1050*4/3*np.pi*(a/2)**3 
 m2=1050*4/3*np.pi*(a2/2)**3
-rc=0.003
 mu = 0.001
-pr0=15e-6
-pr02=15e-6
+pr0=-0.0000001
+pr02=-0.000000001
 
 
 def Ul(p,pphi,rho,U,a,H):
@@ -44,12 +43,13 @@ def metpas (pr0,a):
     return tabr
 
 
-   
+axes=plt.gca()
+axes.set_ylim(-15e-6,15e-6)   
 solution=odeint(Ul,pr0,pphi,args=(rho,U,a,H))
 solution2=odeint(Ul,pr02,pphi,args=(rho,U,a2,H))
 pos=solution[:,0]
 pos2=solution2[:,0]
-plt.plot(pphi,pos)
+plt.plot(pphi,pos,'k')
 plt.plot(pphi,pos2,'r')
 
 
