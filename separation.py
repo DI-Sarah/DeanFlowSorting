@@ -99,7 +99,6 @@ def methodepas(pr,pphi,pr2,pr0,pr02,vr,vr2,rc):
 
 def spirale():
     tabt=np.linspace(10*np.pi,0,10001)
-    tabrint=(a*tabt)
     tabrint=np.linspace(0.003,0.00125,10001)
     tabrext=tabrint+100e-6
     tabxI=tabrint*np.cos(tabt)
